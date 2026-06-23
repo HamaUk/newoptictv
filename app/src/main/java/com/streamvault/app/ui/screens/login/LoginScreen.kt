@@ -83,37 +83,52 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        AppColors.HeroTop,
-                        AppColors.HeroBottom
-                    )
-                )
-            ),
+            .background(Color(0xFF0F1014)), // Dark sleek background
         contentAlignment = Alignment.Center
     ) {
+        // Abstract decorative orbs
+        Box(
+            modifier = Modifier
+                .offset(x = (-200).dp, y = (-150).dp)
+                .size(500.dp)
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(AppColors.Brand.copy(alpha = 0.35f), Color.Transparent)
+                    )
+                )
+        )
+        Box(
+            modifier = Modifier
+                .offset(x = 250.dp, y = 150.dp)
+                .size(600.dp)
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(Color(0xFF6C20D6).copy(alpha = 0.25f), Color.Transparent)
+                    )
+                )
+        )
+
         Surface(
             modifier = Modifier
-                .width(460.dp)
+                .width(480.dp)
                 .padding(24.dp),
             shape = RoundedCornerShape(32.dp),
             colors = SurfaceDefaults.colors(
-                containerColor = AppColors.Surface.copy(alpha = 0.65f)
+                containerColor = Color(0xFF181920).copy(alpha = 0.85f)
             ),
             border = androidx.tv.material3.Border(
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp, 
-                    Brush.verticalGradient(
-                        colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+                    Brush.linearGradient(
+                        colors = listOf(Color.White.copy(alpha = 0.15f), Color.White.copy(alpha = 0.03f))
                     )
                 )
             )
         ) {
             Column(
-                modifier = Modifier.padding(40.dp),
+                modifier = Modifier.padding(horizontal = 48.dp, vertical = 48.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(28.dp)
             ) {
                 StatusPill(
                     label = "KOBANI 4K",

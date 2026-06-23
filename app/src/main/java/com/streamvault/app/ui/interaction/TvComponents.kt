@@ -40,10 +40,9 @@ fun TvClickableSurface(
         focusedScale = com.streamvault.app.ui.design.FocusSpec.FocusedScale
     ),
     glow: ClickableSurfaceGlow = ClickableSurfaceDefaults.glow(
-        focusedGlow = androidx.tv.material3.Glow(
-            elevationColor = com.streamvault.app.ui.theme.Primary.copy(alpha = 0.4f),
-            elevation = com.streamvault.app.ui.design.FocusSpec.GlowRadius
-        )
+        focusedGlow = androidx.tv.material3.Glow.None,
+        glow = androidx.tv.material3.Glow.None,
+        pressedGlow = androidx.tv.material3.Glow.None
     ),
     interactionSource: MutableInteractionSource? = null,
     onLongClick: (() -> Unit)? = null,
@@ -77,10 +76,9 @@ fun TvButton(
         focusedScale = com.streamvault.app.ui.design.FocusSpec.FocusedScale
     ),
     glow: ButtonGlow = ButtonDefaults.glow(
-        focusedGlow = androidx.tv.material3.Glow(
-            elevationColor = com.streamvault.app.ui.theme.Primary.copy(alpha = 0.4f),
-            elevation = com.streamvault.app.ui.design.FocusSpec.GlowRadius
-        )
+        focusedGlow = androidx.tv.material3.Glow.None,
+        glow = androidx.tv.material3.Glow.None,
+        pressedGlow = androidx.tv.material3.Glow.None
     ),
     interactionSource: MutableInteractionSource? = null,
     shape: ButtonShape = ButtonDefaults.shape(),
