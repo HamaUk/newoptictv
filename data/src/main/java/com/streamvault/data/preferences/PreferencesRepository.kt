@@ -154,6 +154,7 @@ class PreferencesRepository @Inject constructor(
         val LAST_MAINTENANCE_EPISODE_ROWS = longPreferencesKey("last_maintenance_episode_rows")
         val LAST_MAINTENANCE_PROGRAM_ROWS = longPreferencesKey("last_maintenance_program_rows")
         val LAST_MAINTENANCE_EPG_PROGRAMME_ROWS = longPreferencesKey("last_maintenance_epg_programme_rows")
+        val LAST_MAINTENANCE_PLAYBACK_HISTORY_ROWS = longPreferencesKey("last_maintenance_playback_history_rows")
         val LAST_MAINTENANCE_FAVORITE_ROWS = longPreferencesKey("last_maintenance_favorite_rows")
         val MONITOR_DEVICE_ID = stringPreferencesKey("monitor_device_id")
     }
