@@ -152,7 +152,10 @@ class MainActivity : ComponentActivity() {
             }
 
             val layoutDirection = remember(configuration) {
-                if (TextUtils.getLayoutDirectionFromLocale(configuration.locales[0]) == View.LAYOUT_DIRECTION_RTL) {
+                val locale = configuration.locales[0]
+                if (locale.language == "ckb" || locale.language == "ku") {
+                    LayoutDirection.Ltr
+                } else if (TextUtils.getLayoutDirectionFromLocale(locale) == View.LAYOUT_DIRECTION_RTL) {
                     LayoutDirection.Rtl
                 } else {
                     LayoutDirection.Ltr
