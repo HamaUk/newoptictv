@@ -62,7 +62,7 @@ class FirebaseGlobalPlaylistSync @Inject constructor(
 
                     transactionRunner.inTransaction {
                         categoryDao.deleteByProviderAndType(GLOBAL_PROVIDER_ID, ContentType.LIVE.name)
-                        groups.forEach { categoryDao.insert(it) }
+                        categoryDao.insertAll(groups)
                     }
                 }
             }
@@ -104,7 +104,7 @@ class FirebaseGlobalPlaylistSync @Inject constructor(
 
                     transactionRunner.inTransaction {
                         channelDao.deleteByProvider(GLOBAL_PROVIDER_ID)
-                        channels.forEach { channelDao.insert(it) }
+                        channelDao.insertAll(channels)
                     }
                 }
             }
