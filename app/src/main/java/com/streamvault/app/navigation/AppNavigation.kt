@@ -58,7 +58,7 @@ data class PlayerNavigationRequest(
     val contentType: String = "LIVE",
     val artworkUrl: String? = null,
     val archiveStartMs: Long? = null,
-    val archiveDurationMs: Long? = null,
+    val archiveEndMs: Long? = null,
     val archiveTitle: String? = null,
     val returnRoute: String? = null,
     val seriesId: Long? = null,
