@@ -334,9 +334,9 @@ class MainActivity : ComponentActivity() {
     @Suppress("DEPRECATION")
     private fun Intent.readPlayerRequestExtra(): PlayerNavigationRequest? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            getSerializableExtra(EXTRA_PLAYER_REQUEST, PlayerNavigationRequest::class.java)
+            getParcelableExtra(EXTRA_PLAYER_REQUEST, PlayerNavigationRequest::class.java)
         } else {
-            getSerializableExtra(EXTRA_PLAYER_REQUEST) as? PlayerNavigationRequest
+            getParcelableExtra(EXTRA_PLAYER_REQUEST)
         }
     }
 }

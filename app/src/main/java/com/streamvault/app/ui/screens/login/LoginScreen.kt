@@ -3,6 +3,7 @@ package com.streamvault.app.ui.screens.login
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -99,10 +101,12 @@ fun LoginScreen(
             colors = SurfaceDefaults.colors(
                 containerColor = AppColors.Surface.copy(alpha = 0.65f)
             ),
-            border = androidx.compose.foundation.BorderStroke(
-                1.dp, 
-                Brush.verticalGradient(
-                    colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+            border = androidx.tv.material3.Border(
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp, 
+                    Brush.verticalGradient(
+                        colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+                    )
                 )
             )
         ) {
@@ -148,7 +152,7 @@ fun LoginScreen(
                             color = AppColors.TextPrimary,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                            letterSpacing = 2.dp
+                            letterSpacing = 2.sp
                         ),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -157,7 +161,7 @@ fun LoginScreen(
                                 Text(
                                     text = "Activation Code",
                                     style = MaterialTheme.typography.titleLarge.copy(
-                                        color = AppColors.TextMuted,
+                                        color = AppColors.TextSecondary,
                                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                         fontWeight = androidx.compose.ui.text.font.FontWeight.Normal
                                     ),

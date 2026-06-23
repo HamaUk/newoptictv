@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kover)
     alias(libs.plugins.google.services)
+    id("kotlin-parcelize")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
