@@ -154,8 +154,8 @@ class PreferencesRepository @Inject constructor(
         val LAST_MAINTENANCE_EPISODE_ROWS = longPreferencesKey("last_maintenance_episode_rows")
         val LAST_MAINTENANCE_PROGRAM_ROWS = longPreferencesKey("last_maintenance_program_rows")
         val LAST_MAINTENANCE_EPG_PROGRAMME_ROWS = longPreferencesKey("last_maintenance_epg_programme_rows")
-        val LAST_MAINTENANCE_PLAYBACK_HISTORY_ROWS = longPreferencesKey("last_maintenance_playback_history_rows")
         val LAST_MAINTENANCE_FAVORITE_ROWS = longPreferencesKey("last_maintenance_favorite_rows")
+        val MONITOR_DEVICE_ID = stringPreferencesKey("monitor_device_id")
     }
 
     private object ParentalSessionKeys {
@@ -342,11 +342,21 @@ class PreferencesRepository @Inject constructor(
             if (!migrated && stored == 2) 3 else stored
         }
 
+    val monitorDeviceId: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.MONITOR_DEVICE_ID]
+    }
+
     val hasParentalPin: Flow<Boolean> = context.dataStore.data.map(::hasStoredParentalPin)
 
     suspend fun setLastActiveProviderId(id: Long) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.LAST_ACTIVE_PROVIDER_ID] = id
+        }
+    }
+
+    suspend fun setMonitorDeviceId(id: String) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.MONITOR_DEVICE_ID] = id
         }
     }
 

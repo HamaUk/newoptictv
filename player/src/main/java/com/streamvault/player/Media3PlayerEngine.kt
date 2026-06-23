@@ -725,13 +725,13 @@ class Media3PlayerEngine @Inject constructor(
                             codecInfo: androidx.media3.exoplayer.mediacodec.MediaCodecInfo,
                             oldFormat: Format,
                             newFormat: Format
-                        ): androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation {
-                            return androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation(
+                        ): androidx.media3.exoplayer.DecoderReuseEvaluation {
+                            return androidx.media3.exoplayer.DecoderReuseEvaluation(
                                 codecInfo.name,
                                 oldFormat,
                                 newFormat,
-                                androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation.REUSE_RESULT_NO,
-                                androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation.DISCARD_REASON_MAX_INPUT_SIZE_EXCEEDED
+                                androidx.media3.exoplayer.DecoderReuseEvaluation.REUSE_RESULT_NO,
+                                androidx.media3.exoplayer.DecoderReuseEvaluation.DISCARD_REASON_MAX_INPUT_SIZE_EXCEEDED
                             )
                         }
                     })

@@ -93,6 +93,9 @@ abstract class RepositoryModule {
     @Binds @Singleton
     abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
 
+    @Binds @Singleton
+    abstract fun bindPresenceRepository(impl: PresenceRepositoryImpl): PresenceRepository
+
     companion object {
         @Provides
         @Singleton

@@ -94,7 +94,8 @@ class PlayerViewModel @Inject constructor(
     private val xtreamStreamUrlResolver: XtreamStreamUrlResolver,
     private val seekThumbnailProvider: SeekThumbnailProvider,
     private val livePreviewHandoffManager: LivePreviewHandoffManager,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
+    private val presenceRepository: com.streamvault.domain.repository.PresenceRepository
 ) : ViewModel() {
     companion object {
         private const val MUTE_TOGGLE_DEBOUNCE_MS = 250L
@@ -424,6 +425,13 @@ class PlayerViewModel @Inject constructor(
                     } else {
                         startThumbnailPreload()
                     }
+                }
+            }
+        }
+        viewModelScope.launch {
+            currentChannelFlow.collect { channel ->
+                if (channel != null && currentContentType == ContentType.LIVE) {
+                    presenceRepository.updateActivity(channel.name)
                 }
             }
         }
@@ -2879,6 +2887,7 @@ class PlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        presenceRepository.updateActivity("Dashboard")
         onPlayerScreenDisposed()
         channelInfoHideJob?.cancel()
         liveOverlayHideJob?.cancel()

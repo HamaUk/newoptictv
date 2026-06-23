@@ -26,6 +26,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 import javax.inject.Inject
 import com.streamvault.data.preferences.PreferencesRepository
+import com.streamvault.domain.repository.PresenceRepository
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -80,6 +81,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var castManager: CastManager
 
+    @Inject
+    lateinit var presenceRepository: PresenceRepository
+
     private val _pictureInPictureModeFlow = MutableStateFlow(false)
     val pictureInPictureModeFlow: StateFlow<Boolean> = _pictureInPictureModeFlow.asStateFlow()
 
@@ -112,6 +116,11 @@ class MainActivity : ComponentActivity() {
                 tvInputChannelSyncManager.refreshTvInputCatalog()
             }
         }
+        
+        lifecycleScope.launch {
+            presenceRepository.startTracking()
+        }
+
         setContent {
             val appLanguage by preferencesRepository.appLanguage.collectAsState(initial = "system")
             val currentContext = LocalContext.current
@@ -165,6 +174,11 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleExternalIntent(intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenceRepository.stopTracking()
     }
 
     override fun onUserLeaveHint() {
