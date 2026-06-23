@@ -7,30 +7,7 @@ import java.util.Locale
 private val supportedLanguageTags = listOf(
     "en",
     "ar",
-    "cs",
-    "da",
-    "de",
-    "el",
-    "es",
-    "fi",
-    "fr",
-    "he",
-    "hu",
-    "id",
-    "it",
-    "ja",
-    "ko",
-    "nb",
-    "nl",
-    "pl",
-    "pt",
-    "ro",
-    "ru",
-    "sv",
-    "tr",
-    "uk",
-    "vi",
-    "zh"
+    "ckb"
 )
 
 fun supportedAppLanguageTags(): List<String> = supportedLanguageTags
