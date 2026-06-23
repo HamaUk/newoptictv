@@ -93,71 +93,118 @@ fun LoginScreen(
     ) {
         Surface(
             modifier = Modifier
-                .width(420.dp)
+                .width(460.dp)
                 .padding(24.dp),
-            shape = RoundedCornerShape(28.dp),
+            shape = RoundedCornerShape(32.dp),
             colors = SurfaceDefaults.colors(
-                containerColor = AppColors.Surface.copy(alpha = 0.85f)
+                containerColor = AppColors.Surface.copy(alpha = 0.65f)
+            ),
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp, 
+                Brush.verticalGradient(
+                    colors = listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+                )
             )
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 StatusPill(
                     label = "KOBANI 4K",
                     containerColor = AppColors.Brand,
-                    contentColor = Color.White
+                    contentColor = Color.White,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
-                    text = "Activate Device",
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = "Welcome Back",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
                     color = AppColors.TextPrimary
                 )
 
                 Text(
-                    text = "Please enter your activation code to continue",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Enter your activation code to sync your playlist and start watching.",
+                    style = MaterialTheme.typography.bodyLarge,
                     color = AppColors.TextSecondary,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
 
-                SearchInput(
-                    value = loginCode,
-                    onValueChange = { loginCode = it },
-                    placeholder = "Enter Code",
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .background(AppColors.SurfaceElevated, RoundedCornerShape(16.dp))
+                        .border(1.dp, AppColors.Focus.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        .padding(horizontal = 24.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    androidx.compose.foundation.text.BasicTextField(
+                        value = loginCode,
+                        onValueChange = { loginCode = it },
+                        textStyle = MaterialTheme.typography.titleLarge.copy(
+                            color = AppColors.TextPrimary,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                            letterSpacing = 2.dp
+                        ),
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        decorationBox = { innerTextField ->
+                            if (loginCode.isEmpty()) {
+                                Text(
+                                    text = "Activation Code",
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        color = AppColors.TextMuted,
+                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Normal
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+                }
 
                 if (uiState is LoginUiState.Error) {
                     Text(
                         text = (uiState as LoginUiState.Error).message,
                         color = AppColors.Warning,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 TvButton(
                     onClick = { viewModel.login(loginCode) },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState !is LoginUiState.Loading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    enabled = uiState !is LoginUiState.Loading && loginCode.isNotBlank(),
                     colors = ButtonDefaults.colors(
                         containerColor = AppColors.Brand,
-                        contentColor = Color.White
-                    )
+                        contentColor = Color.White,
+                        focusedContainerColor = AppColors.SurfaceEmphasis
+                    ),
+                    shape = ButtonDefaults.shape(RoundedCornerShape(16.dp))
                 ) {
                     if (uiState is LoginUiState.Loading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(28.dp),
                             color = Color.White,
-                            strokeWidth = 2.dp
+                            strokeWidth = 3.dp
                         )
                     } else {
-                        Text("LOGIN")
+                        Text(
+                            text = "Log In to KOBANI",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+                        )
                     }
                 }
             }

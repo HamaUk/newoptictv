@@ -42,12 +42,11 @@ class FirebaseGlobalPlaylistSync @Inject constructor(
                     val groups = mutableListOf<CategoryEntity>()
                     val children = snapshot.children
                     children.forEachIndexed { index, groupSnapshot ->
-                        val key = groupSnapshot.key ?: return@forEachIndexed
                         val name = groupSnapshot.child("name").getValue(String::class.java) ?: "Unknown"
                         val order = groupSnapshot.child("order").getValue(Int::class.java) ?: 999999
                         
-                        // We use hash of the key to generate a stable categoryId
-                        val categoryId = key.hashCode().toLong() and 0xFFFFFFFFL
+                        // We use hash of the name to ensure it matches the channel's group name hash
+                        val categoryId = name.hashCode().toLong() and 0xFFFFFFFFL
                         
                         groups.add(
                             CategoryEntity(

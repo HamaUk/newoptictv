@@ -39,8 +39,12 @@ import java.io.Serializable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 private const val PLAYER_REQUEST_KEY = "player_request"
 
+@Parcelize
 data class PlayerNavigationRequest(
     val streamUrl: String,
     val title: String,
@@ -60,7 +64,7 @@ data class PlayerNavigationRequest(
     val seriesId: Long? = null,
     val seasonNumber: Int? = null,
     val episodeNumber: Int? = null
-) : Serializable
+) : Parcelable
 
 object Routes {
     const val PROVIDER_SETUP = "provider_setup?providerId={providerId}&importUri={importUri}"

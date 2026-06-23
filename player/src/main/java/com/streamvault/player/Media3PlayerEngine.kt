@@ -684,17 +684,35 @@ class Media3PlayerEngine @Inject constructor(
     private fun buildRenderersFactory(): DefaultRenderersFactory {
         val baseFactory = if (compatibilityProfile.shouldDisableDecoderReuseWorkaround()) {
             object : DefaultRenderersFactory(context) {
+                override fun buildAudioRenderers(
+                    context: Context,
+                    extensionRendererMode: Int,
+                    mediaCodecSelector: MediaCodecSelector,
+                    enableDecoderFallback: Boolean,
+                    audioSink: androidx.media3.exoplayer.audio.AudioSink,
+                    eventHandler: Handler,
+                    eventListener: androidx.media3.exoplayer.audio.AudioRendererEventListener,
+                    out: ArrayList<Renderer>
+                ) {
+                    // Disable Audio Offload/Passthrough to fix "No Audio" on some Android TV boxes
+                    val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                        .setEnableFloatOutput(false)
+                        .setEnableAudioTrackPlaybackParams(false)
+                        .build()
+                    super.buildAudioRenderers(context, extensionRendererMode, mediaCodecSelector, enableDecoderFallback, customAudioSink, eventHandler, eventListener, out)
+                }
+
                 override fun buildVideoRenderers(
                     context: Context,
                     extensionRendererMode: Int,
                     mediaCodecSelector: MediaCodecSelector,
                     enableDecoderFallback: Boolean,
                     eventHandler: Handler,
-                    eventListener: VideoRendererEventListener,
+                    eventListener: androidx.media3.exoplayer.video.VideoRendererEventListener,
                     allowedVideoJoiningTimeMs: Long,
                     out: ArrayList<Renderer>
                 ) {
-                    out.add(object : MediaCodecVideoRenderer(
+                    out.add(object : androidx.media3.exoplayer.video.MediaCodecVideoRenderer(
                         context,
                         mediaCodecSelector,
                         allowedVideoJoiningTimeMs,
@@ -704,23 +722,41 @@ class Media3PlayerEngine @Inject constructor(
                         50
                     ) {
                         override fun canReuseCodec(
-                            codecInfo: MediaCodecInfo,
+                            codecInfo: androidx.media3.exoplayer.mediacodec.MediaCodecInfo,
                             oldFormat: Format,
                             newFormat: Format
-                        ): DecoderReuseEvaluation {
-                            return DecoderReuseEvaluation(
+                        ): androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation {
+                            return androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation(
                                 codecInfo.name,
                                 oldFormat,
                                 newFormat,
-                                DecoderReuseEvaluation.REUSE_RESULT_NO,
-                                DecoderReuseEvaluation.DISCARD_REASON_MAX_INPUT_SIZE_EXCEEDED
+                                androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation.REUSE_RESULT_NO,
+                                androidx.media3.exoplayer.mediacodec.DecoderReuseEvaluation.DISCARD_REASON_MAX_INPUT_SIZE_EXCEEDED
                             )
                         }
                     })
                 }
             }
         } else {
-            DefaultRenderersFactory(context)
+            object : DefaultRenderersFactory(context) {
+                override fun buildAudioRenderers(
+                    context: Context,
+                    extensionRendererMode: Int,
+                    mediaCodecSelector: MediaCodecSelector,
+                    enableDecoderFallback: Boolean,
+                    audioSink: androidx.media3.exoplayer.audio.AudioSink,
+                    eventHandler: Handler,
+                    eventListener: androidx.media3.exoplayer.audio.AudioRendererEventListener,
+                    out: ArrayList<Renderer>
+                ) {
+                    // Disable Audio Offload/Passthrough to fix "No Audio" on some Android TV boxes
+                    val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                        .setEnableFloatOutput(false)
+                        .setEnableAudioTrackPlaybackParams(false)
+                        .build()
+                    super.buildAudioRenderers(context, extensionRendererMode, mediaCodecSelector, enableDecoderFallback, customAudioSink, eventHandler, eventListener, out)
+                }
+            }
         }
 
         return baseFactory.apply {

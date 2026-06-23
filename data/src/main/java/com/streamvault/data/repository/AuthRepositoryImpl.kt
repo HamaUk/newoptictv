@@ -25,7 +25,11 @@ class AuthRepositoryImpl @Inject constructor(
         }
         firebaseAuth.addAuthStateListener(listener)
         awaitClose { firebaseAuth.removeAuthStateListener(listener) }
-    }
+    }.stateIn(
+        scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main),
+        started = kotlinx.coroutines.flow.SharingStarted.Eagerly,
+        initialValue = firebaseAuth.currentUser?.let { AppUser(id = it.uid, email = it.email, isAnonymous = it.isAnonymous) }
+    )
 
     override suspend fun loginWithCode(code: String): Result<Unit> = runCatching {
         // Look up the code field inside the activeSessions path dynamically

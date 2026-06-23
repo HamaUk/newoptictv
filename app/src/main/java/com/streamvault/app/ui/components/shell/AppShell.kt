@@ -346,12 +346,7 @@ private fun TopNavigationButton(
             containerColor = if (selected) AppColors.BrandMuted else Color.Transparent,
             focusedContainerColor = AppColors.SurfaceEmphasis
         ),
-        glow = ClickableSurfaceDefaults.glow(
-            focusedGlow = androidx.tv.material3.Glow(
-                elevationColor = AppColors.Brand.copy(alpha = 0.5f),
-                elevation = FocusSpec.GlowRadius
-            )
-        ),
+        glow = ClickableSurfaceDefaults.glow(),
         border = ClickableSurfaceDefaults.border(
             focusedBorder = Border(
                 border = BorderStroke(FocusSpec.BorderWidth, AppColors.Focus),
@@ -748,12 +743,7 @@ private fun RailButton(
             containerColor = if (selected) AppColors.BrandMuted else Color.Transparent,
             focusedContainerColor = AppColors.SurfaceEmphasis
         ),
-        glow = ClickableSurfaceDefaults.glow(
-            focusedGlow = androidx.tv.material3.Glow(
-                elevationColor = AppColors.Brand.copy(alpha = 0.5f),
-                elevation = FocusSpec.GlowRadius
-            )
-        ),
+        glow = ClickableSurfaceDefaults.glow(),
         border = ClickableSurfaceDefaults.border(
             focusedBorder = Border(
                 border = BorderStroke(FocusSpec.BorderWidth, AppColors.Focus),
