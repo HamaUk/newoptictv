@@ -47,14 +47,20 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.first
 
+sealed interface AuthState {
+    data object Loading : AuthState()
+    data class Checked(val user: AppUser?) : AuthState()
+}
+
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
     private val providerRepository: ProviderRepository,
     authRepository: AuthRepository
 ) : ViewModel() {
 
-    val currentUser: StateFlow<AppUser?> = authRepository.currentUser
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    val authState: StateFlow<AuthState> = authRepository.currentUser
+        .map { AuthState.Checked(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AuthState.Loading)
 
     private val _hasProviders = MutableStateFlow<Boolean?>(null)
     val hasProviders: StateFlow<Boolean?> = _hasProviders.asStateFlow()
@@ -80,7 +86,7 @@ fun WelcomeScreen(
     viewModel: WelcomeViewModel = hiltViewModel()
 ) {
     val hasProviders by viewModel.hasProviders.collectAsStateWithLifecycle()
-    val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
 
     val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "welcomeBreathing")
     val breathingScale by infiniteTransition.animateFloat(
@@ -93,14 +99,16 @@ fun WelcomeScreen(
         label = "breathingScale"
     )
 
-    LaunchedEffect(currentUser, hasProviders) {
-        if (currentUser == null) {
-            onNavigateToLogin()
-        } else {
-            when (hasProviders) {
-                true -> onNavigateToHome()
-                false -> onNavigateToHome() // Fallback to home even if empty, dashboard handles it
-                null -> Unit
+    LaunchedEffect(authState, hasProviders) {
+        if (authState is AuthState.Checked) {
+            if ((authState as AuthState.Checked).user == null) {
+                onNavigateToLogin()
+            } else {
+                when (hasProviders) {
+                    true -> onNavigateToHome()
+                    false -> onNavigateToHome() // Fallback to home even if empty, dashboard handles it
+                    null -> Unit
+                }
             }
         }
     }

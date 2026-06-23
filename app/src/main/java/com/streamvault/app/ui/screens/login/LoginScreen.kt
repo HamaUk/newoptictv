@@ -131,7 +131,7 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(28.dp)
             ) {
                 StatusPill(
-                    label = "KOBANI 4K",
+                    label = stringResource(R.string.app_name),
                     containerColor = AppColors.Brand,
                     contentColor = Color.White,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -221,7 +221,7 @@ fun LoginScreen(
                         )
                     } else {
                         Text(
-                            text = "Log In to KOBANI",
+                            text = "Log In",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
                         )
                     }
