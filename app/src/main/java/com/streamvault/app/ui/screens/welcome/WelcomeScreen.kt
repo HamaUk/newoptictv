@@ -1,0 +1,159 @@
+package com.streamvault.app.ui.screens.welcome
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
+import androidx.tv.material3.Text
+import com.streamvault.app.R
+import com.streamvault.app.ui.components.shell.StatusPill
+import com.streamvault.app.ui.design.AppColors
+import com.streamvault.domain.repository.ProviderRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import com.streamvault.domain.repository.AuthRepository
+import com.streamvault.domain.repository.AppUser
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
+
+@HiltViewModel
+class WelcomeViewModel @Inject constructor(
+    private val providerRepository: ProviderRepository,
+    authRepository: AuthRepository
+) : ViewModel() {
+
+    val currentUser: StateFlow<AppUser?> = authRepository.currentUser
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    private val _hasProviders = MutableStateFlow<Boolean?>(null)
+    val hasProviders: StateFlow<Boolean?> = _hasProviders.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            // Trigger sync to ensure Firebase Global Playlist is active
+            if (authRepository.currentUser.first() != null) {
+                providerRepository.syncProvidersFromFirebase()
+            }
+            
+            providerRepository.getProviders()
+                .map { it.isNotEmpty() }
+                .collect { _hasProviders.value = it }
+        }
+    }
+}
+
+@Composable
+fun WelcomeScreen(
+    onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    viewModel: WelcomeViewModel = hiltViewModel()
+) {
+    val hasProviders by viewModel.hasProviders.collectAsStateWithLifecycle()
+    val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+
+    val infiniteTransition = androidx.compose.animation.core.rememberInfiniteTransition(label = "welcomeBreathing")
+    val breathingScale by infiniteTransition.animateFloat(
+        initialValue = 0.98f,
+        targetValue = 1.02f,
+        animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+            animation = tween(2500, easing = androidx.compose.animation.core.LinearOutSlowInEasing),
+            repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+        ),
+        label = "breathingScale"
+    )
+
+    LaunchedEffect(currentUser, hasProviders) {
+        if (currentUser == null) {
+            onNavigateToLogin()
+        } else {
+            when (hasProviders) {
+                true -> onNavigateToHome()
+                false -> onNavigateToHome() // Fallback to home even if empty, dashboard handles it
+                null -> Unit
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.22f),
+                            AppColors.HeroTop,
+                            AppColors.HeroBottom
+                        )
+                    )
+                )
+        )
+
+        Surface(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(32.dp)
+                .graphicsLayer {
+                    scaleX = breathingScale
+                    scaleY = breathingScale
+                },
+            shape = RoundedCornerShape(28.dp),
+            colors = SurfaceDefaults.colors(containerColor = AppColors.Surface.copy(alpha = 0.9f))
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 36.dp, vertical = 28.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                StatusPill(
+                    label = stringResource(R.string.app_name),
+                    containerColor = AppColors.BrandMuted
+                )
+                Spacer(modifier = Modifier.height(18.dp))
+                CircularProgressIndicator(color = AppColors.Brand)
+                Spacer(modifier = Modifier.height(18.dp))
+                Text(
+                    text = stringResource(R.string.welcome_loading_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = AppColors.TextPrimary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = stringResource(R.string.welcome_loading_subtitle),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = AppColors.TextSecondary
+                )
+            }
+        }
+    }
+}
