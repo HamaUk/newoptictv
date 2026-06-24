@@ -39,8 +39,6 @@ mockito-kotlin = "5.4.0"
 androidx-test-ext-junit = "1.2.1"
 espresso = "3.6.1"
 androidx-test-runner = "1.6.2"
-# VLC
-vlc = "3.5.1"
 
 [libraries]
 # Compose BOM
@@ -64,8 +62,6 @@ media3-datasource-okhttp = { group = "androidx.media3", name = "media3-datasourc
 media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3" }
 media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 
-# VLC
-vlc-android = { group = "org.videolan.android", name = "libvlc-all", version.ref = "vlc" }
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

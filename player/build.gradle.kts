@@ -47,8 +47,6 @@ dependencies {
     implementation(libs.media3.ui)
     implementation(libs.media3.ffmpeg.decoder)
 
-    // VLC
-    implementation(libs.vlc.android)
 
     // OkHttp (for custom data source)
     implementation(libs.okhttp)

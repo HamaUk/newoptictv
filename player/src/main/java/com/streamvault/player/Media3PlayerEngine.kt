@@ -645,13 +645,24 @@ class Media3PlayerEngine @Inject constructor(
 
     private fun createPlayer(): ExoPlayer {
         val renderersFactory = buildRenderersFactory()
-        val maxBufferMs = if (currentBufferIsLive == true) 30_000 else 120_000
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        val isLowRam = activityManager.isLowRamDevice
+
+        val minBufferMs = if (isLowRam) 10_000 else 30_000
+        val maxBufferMs = if (isLowRam) {
+            if (currentBufferIsLive == true) 15_000 else 30_000
+        } else {
+            if (currentBufferIsLive == true) 30_000 else 120_000
+        }
+        val bufferForPlaybackMs = if (isLowRam) 1_500 else 2_500
+        val bufferForPlaybackAfterRebufferMs = if (isLowRam) 3_000 else 10_000
+
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                30_000,
+                minBufferMs,
                 maxBufferMs,
-                2_500,
-                10_000
+                bufferForPlaybackMs,
+                bufferForPlaybackAfterRebufferMs
             )
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
@@ -694,8 +705,12 @@ class Media3PlayerEngine @Inject constructor(
                     eventListener: androidx.media3.exoplayer.audio.AudioRendererEventListener,
                     out: ArrayList<Renderer>
                 ) {
-                    // Disable Audio Offload/Passthrough to fix "No Audio" on some Android TV boxes
+                    // Disable Audio Offload/Passthrough and double buffer to fix "No Audio" on some Android TV boxes
+                    val bufferSizeProvider = androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider.Builder()
+                        .setMultiplier(2)
+                        .build()
                     val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                        .setAudioTrackBufferSizeProvider(bufferSizeProvider)
                         .setEnableFloatOutput(false)
                         .setEnableAudioTrackPlaybackParams(false)
                         .build()
@@ -749,8 +764,12 @@ class Media3PlayerEngine @Inject constructor(
                     eventListener: androidx.media3.exoplayer.audio.AudioRendererEventListener,
                     out: ArrayList<Renderer>
                 ) {
-                    // Disable Audio Offload/Passthrough to fix "No Audio" on some Android TV boxes
+                    // Disable Audio Offload/Passthrough and double buffer to fix "No Audio" on some Android TV boxes
+                    val bufferSizeProvider = androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider.Builder()
+                        .setMultiplier(2)
+                        .build()
                     val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
+                        .setAudioTrackBufferSizeProvider(bufferSizeProvider)
                         .setEnableFloatOutput(false)
                         .setEnableAudioTrackPlaybackParams(false)
                         .build()
@@ -760,6 +779,7 @@ class Media3PlayerEngine @Inject constructor(
         }
 
         return baseFactory.apply {
+            setMediaCodecSelector(createCustomMediaCodecSelector())
             setEnableDecoderFallback(true)
             setExtensionRendererMode(
                 when (activeDecoderMode) {
@@ -767,6 +787,24 @@ class Media3PlayerEngine @Inject constructor(
                     DecoderMode.SOFTWARE -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
                 }
             )
+        }
+    }
+
+    private fun createCustomMediaCodecSelector(): MediaCodecSelector {
+        return object : MediaCodecSelector {
+            override fun getDecoderInfos(
+                mimeType: String,
+                requiresSecureDecoder: Boolean,
+                requiresTunnelingDecoder: Boolean
+            ): MutableList<MediaCodecInfo> {
+                val decoders = MediaCodecSelector.DEFAULT.getDecoderInfos(mimeType, requiresSecureDecoder, requiresTunnelingDecoder).toMutableList()
+                if (activeDecoderMode == DecoderMode.SOFTWARE) {
+                    decoders.sortByDescending { it.name.startsWith("OMX.google.") || it.name.startsWith("c2.android.") }
+                } else if (activeDecoderMode == DecoderMode.HARDWARE) {
+                    decoders.sortBy { it.name.startsWith("OMX.google.") || it.name.startsWith("c2.android.") }
+                }
+                return decoders
+            }
         }
     }
 

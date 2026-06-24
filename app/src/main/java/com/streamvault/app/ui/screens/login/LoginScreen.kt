@@ -1,18 +1,20 @@
 package com.streamvault.app.ui.screens.login
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.border
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -20,8 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.tv.material3.*
 import com.streamvault.app.R
-import com.streamvault.app.ui.components.SearchInput
-import com.streamvault.app.ui.components.shell.StatusPill
 import com.streamvault.app.ui.design.AppColors
 import com.streamvault.app.ui.interaction.TvButton
 import com.streamvault.domain.model.Result
@@ -83,105 +83,124 @@ fun LoginScreen(
         }
     }
 
+    // Background animation
+    val infiniteTransition = rememberInfiniteTransition(label = "bg")
+    val gradientOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(15000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "gradientOffset"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F1014)), // Dark sleek background
+            .background(Color(0xFF09090C)),
         contentAlignment = Alignment.Center
     ) {
-        // Abstract decorative orbs
+        // Dynamic Orbs
         Box(
             modifier = Modifier
-                .offset(x = (-200).dp, y = (-150).dp)
-                .size(500.dp)
+                .offset(x = (-300).dp, y = (-200).dp)
+                .size(700.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(AppColors.Brand.copy(alpha = 0.35f), Color.Transparent)
+                        colors = listOf(AppColors.Brand.copy(alpha = 0.2f), Color.Transparent),
+                        radius = 700f + (gradientOffset / 5f)
                     )
                 )
         )
         Box(
             modifier = Modifier
-                .offset(x = 250.dp, y = 150.dp)
-                .size(600.dp)
+                .offset(x = 350.dp, y = 200.dp)
+                .size(800.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(Color(0xFF6C20D6).copy(alpha = 0.25f), Color.Transparent)
+                        colors = listOf(Color(0xFF6C20D6).copy(alpha = 0.15f), Color.Transparent),
+                        radius = 800f - (gradientOffset / 5f)
                     )
                 )
         )
 
         Surface(
             modifier = Modifier
-                .width(480.dp)
+                .width(440.dp)
                 .padding(24.dp),
             shape = RoundedCornerShape(32.dp),
             colors = SurfaceDefaults.colors(
-                containerColor = Color(0xFF181920).copy(alpha = 0.85f)
+                containerColor = Color(0xFF13141B).copy(alpha = 0.75f)
             ),
             border = androidx.tv.material3.Border(
                 border = androidx.compose.foundation.BorderStroke(
                     1.dp, 
                     Brush.linearGradient(
-                        colors = listOf(Color.White.copy(alpha = 0.15f), Color.White.copy(alpha = 0.03f))
+                        colors = listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.02f))
                     )
                 )
             )
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 48.dp, vertical = 48.dp),
+                modifier = Modifier.padding(horizontal = 40.dp, vertical = 48.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(28.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                StatusPill(
-                    label = stringResource(R.string.app_name),
-                    containerColor = AppColors.Brand,
-                    contentColor = Color.White,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                // Kobani4k Logo Text
+                Text(
+                    text = "KOBANI4K",
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 4.sp
+                    ),
+                    color = Color.White,
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
 
                 Text(
                     text = "Welcome Back",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = AppColors.TextPrimary
                 )
 
                 Text(
-                    text = "Enter your activation code to sync your playlist and start watching.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = AppColors.TextSecondary,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    text = "Enter your activation code below to sync your playlist.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppColors.TextSecondary.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp)
-                        .background(AppColors.SurfaceElevated, RoundedCornerShape(16.dp))
-                        .border(1.dp, AppColors.Focus.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
-                        .padding(horizontal = 24.dp),
+                        .height(56.dp)
+                        .background(Color(0xFF1A1B22), RoundedCornerShape(12.dp))
+                        .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                        .padding(horizontal = 20.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     androidx.compose.foundation.text.BasicTextField(
                         value = loginCode,
                         onValueChange = { loginCode = it },
-                        textStyle = MaterialTheme.typography.titleLarge.copy(
+                        textStyle = MaterialTheme.typography.titleMedium.copy(
                             color = AppColors.TextPrimary,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                            letterSpacing = 2.sp
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 3.sp
                         ),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         decorationBox = { innerTextField ->
                             if (loginCode.isEmpty()) {
                                 Text(
-                                    text = "Activation Code",
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        color = AppColors.TextSecondary,
-                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Normal
+                                    text = "ACTIVATION CODE",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = AppColors.TextSecondary.copy(alpha = 0.4f),
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Medium,
+                                        letterSpacing = 2.sp
                                     ),
                                     modifier = Modifier.fillMaxWidth()
                                 )
@@ -195,13 +214,22 @@ fun LoginScreen(
                     Text(
                         text = (uiState as LoginUiState.Error).message,
                         color = AppColors.Warning,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier.padding(top = 4.dp)
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val isLoading = uiState is LoginUiState.Loading
+                
+                // Button Animation
+                val buttonScale by animateFloatAsState(
+                    targetValue = if (isLoading) 0.95f else 1f,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                    label = "buttonScale"
+                )
 
                 TvButton(
                     onClick = { 
@@ -210,25 +238,39 @@ fun LoginScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
-                    enabled = uiState !is LoginUiState.Loading && loginCode.isNotBlank(),
+                        .height(52.dp)
+                        .scale(buttonScale),
+                    enabled = !isLoading && loginCode.isNotBlank(),
                     colors = ButtonDefaults.colors(
                         containerColor = AppColors.Brand,
                         contentColor = Color.White,
-                        focusedContainerColor = AppColors.SurfaceEmphasis
+                        focusedContainerColor = AppColors.Brand.copy(alpha = 0.8f)
                     ),
-                    shape = ButtonDefaults.shape(RoundedCornerShape(16.dp))
+                    shape = ButtonDefaults.shape(RoundedCornerShape(12.dp))
                 ) {
-                    if (uiState is LoginUiState.Loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(28.dp),
-                            color = Color.White,
-                            strokeWidth = 3.dp
-                        )
+                    if (isLoading) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color.White,
+                                strokeWidth = 2.5.dp
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Authenticating...",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                        }
                     } else {
                         Text(
                             text = "Log In",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
                         )
                     }
                 }

@@ -42,6 +42,17 @@ class PlayerMediaSourceFactory(
             streamInfo.streamType == StreamType.RTSP || resolvedStreamType == ResolvedStreamType.RTSP ->
                 RtspMediaSource.Factory().createMediaSource(mediaItem)
             resolvedStreamType == ResolvedStreamType.HLS -> HlsMediaSource.Factory(dataSourceFactory)
+                .setExtractorFactory(
+                    androidx.media3.exoplayer.hls.DefaultHlsExtractorFactory(
+                        DefaultExtractorsFactory()
+                            .setTsExtractorFlags(
+                                DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
+                                    or DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                                    or DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM
+                            )
+                            .setTsSubtitleFormats(TS_SUBTITLE_FORMATS)
+                    )
+                )
                 .setAllowChunklessPreparation(true)
                 .setLoadErrorHandlingPolicy(retryPolicy)
                 .createMediaSource(mediaItem)
@@ -63,7 +74,16 @@ class PlayerMediaSourceFactory(
                 .setLoadErrorHandlingPolicy(retryPolicy)
                 .createMediaSource(mediaItem)
 
-            resolvedStreamType == ResolvedStreamType.PROGRESSIVE -> ProgressiveMediaSource.Factory(dataSourceFactory)
+            resolvedStreamType == ResolvedStreamType.PROGRESSIVE -> ProgressiveMediaSource.Factory(
+                dataSourceFactory,
+                DefaultExtractorsFactory()
+                    .setTsExtractorFlags(
+                        DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
+                            or DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                            or DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM
+                    )
+                    .setTsSubtitleFormats(TS_SUBTITLE_FORMATS)
+            )
                 .setLoadErrorHandlingPolicy(retryPolicy)
                 .createMediaSource(mediaItem)
 
