@@ -180,24 +180,22 @@ class VlcPlayerEngine(
     override fun preload(streamInfo: StreamInfo?) {}
 
     override fun createRenderView(context: Context, resizeMode: PlayerSurfaceResizeMode, surfaceType: PlayerRenderSurfaceType): View {
-        return SurfaceView(context).apply {
+        return org.videolan.libvlc.util.VLCVideoLayout(context).apply {
             layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         }
     }
 
     override fun bindRenderView(renderView: View, resizeMode: PlayerSurfaceResizeMode) {
         this.renderView = renderView
-        if (renderView is SurfaceView) {
-            mediaPlayer?.vlcVout?.setVideoView(renderView)
-            mediaPlayer?.vlcVout?.attachViews()
-        } else if (renderView is TextureView) {
-            mediaPlayer?.vlcVout?.setVideoView(renderView)
-            mediaPlayer?.vlcVout?.attachViews()
+        if (renderView is org.videolan.libvlc.util.VLCVideoLayout) {
+            mediaPlayer?.attachViews(renderView, null, false, false)
         }
     }
 
     override fun clearRenderBinding() {
-        mediaPlayer?.vlcVout?.detachViews()
+        if (renderView is org.videolan.libvlc.util.VLCVideoLayout) {
+            mediaPlayer?.detachViews()
+        }
         this.renderView = null
     }
 
