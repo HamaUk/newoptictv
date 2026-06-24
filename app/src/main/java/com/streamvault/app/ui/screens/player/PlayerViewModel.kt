@@ -405,9 +405,14 @@ class PlayerViewModel @Inject constructor(
                     activePlayerEngineFlow.value = newEngine
                     
                     // Restore state if we were already playing
-                    if (wasPlaying && currentStreamInfo != null) {
-                        newEngine.prepare(currentStreamInfo!!)
-                        newEngine.seekTo(currentPos)
+                    if (wasPlaying && currentStreamUrl.isNotBlank()) {
+                        val streamInfo = resolvePlaybackStreamInfo(currentStreamUrl, currentContentId, currentProviderId, currentContentType)
+                        if (streamInfo != null) {
+                            if (preparePlayer(streamInfo, prepareRequestVersion)) {
+                                newEngine.seekTo(currentPos)
+                                newEngine.play()
+                            }
+                        }
                     }
                 } else {
                     newEngine.release() // Duplicate type, discard

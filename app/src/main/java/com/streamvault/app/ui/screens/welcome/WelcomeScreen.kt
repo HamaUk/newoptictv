@@ -48,8 +48,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.first
 
 sealed interface AuthState {
-    data object Loading : AuthState()
-    data class Checked(val user: AppUser?) : AuthState()
+    data object Loading : AuthState
+    data class Checked(val user: AppUser?) : AuthState
 }
 
 @HiltViewModel
