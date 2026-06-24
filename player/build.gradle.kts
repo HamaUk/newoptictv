@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.media3.datasource.okhttp)
     implementation(libs.media3.session)
     implementation(libs.media3.ui)
+    implementation(libs.media3.ffmpeg.decoder)
 
     // VLC
     implementation(libs.vlc.android)
