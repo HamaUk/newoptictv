@@ -19,12 +19,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.streamvault.domain.model.StreamInfo
-import com.streamvault.player.DecoderMode
+import com.streamvault.domain.model.DecoderMode
 import com.streamvault.player.PlaybackState
 import com.streamvault.player.PlayerEngine
 import com.streamvault.player.PlayerError
 import com.streamvault.player.PlayerRetryStatus
-import com.streamvault.player.VideoFormat
+import com.streamvault.domain.model.VideoFormat
 import com.streamvault.player.PlayerStats
 import com.streamvault.player.PlayerTrack
 import com.streamvault.player.PlayerSubtitleStyle
