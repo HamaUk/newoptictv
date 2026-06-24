@@ -59,7 +59,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.app.Application
-import android.app.Application
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -366,6 +365,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+        }
         viewModelScope.launch {
             preferencesRepository.playerEngineType.collectLatest { engineType ->
                 currentPlayerEngineType = engineType

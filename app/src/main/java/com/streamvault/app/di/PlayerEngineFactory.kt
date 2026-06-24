@@ -18,7 +18,7 @@ class PlayerEngineFactory @Inject constructor(
     fun create(type: PlayerEngineType, forAuxiliary: Boolean = false): PlayerEngine {
         val engine = when (type) {
             PlayerEngineType.EXO_PLAYER -> Media3PlayerEngine(context, okHttpClient)
-            PlayerEngineType.VLC_PLAYER -> VlcPlayerEngine(context)
+            PlayerEngineType.VLC -> VlcPlayerEngine(context)
         }
         if (forAuxiliary && engine is Media3PlayerEngine) {
             engine.enableMediaSession = false
