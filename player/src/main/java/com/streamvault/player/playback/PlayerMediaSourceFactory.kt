@@ -44,13 +44,10 @@ class PlayerMediaSourceFactory(
             resolvedStreamType == ResolvedStreamType.HLS -> HlsMediaSource.Factory(dataSourceFactory)
                 .setExtractorFactory(
                     androidx.media3.exoplayer.hls.DefaultHlsExtractorFactory(
-                        DefaultExtractorsFactory()
-                            .setTsExtractorFlags(
-                                DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
-                                    or DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
-                                    or DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM
-                            )
-                            .setTsSubtitleFormats(TS_SUBTITLE_FORMATS)
+                        DefaultTsPayloadReaderFactory.FLAG_DETECT_ACCESS_UNITS
+                            or DefaultTsPayloadReaderFactory.FLAG_ALLOW_NON_IDR_KEYFRAMES
+                            or DefaultTsPayloadReaderFactory.FLAG_IGNORE_SPLICE_INFO_STREAM,
+                        true
                     )
                 )
                 .setAllowChunklessPreparation(true)
