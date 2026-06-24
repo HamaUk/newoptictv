@@ -148,21 +148,28 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // Kobani4k Logo Text
-                Text(
-                    text = "KOBANI4K",
-                    style = MaterialTheme.typography.displayMedium.copy(
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 4.sp
-                    ),
-                    color = Color.White,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-
-                Text(
-                    text = "Welcome Back",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = AppColors.TextPrimary
-                )
+                Row(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "KOBANI ",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp
+                        ),
+                        color = Color.White
+                    )
+                    Text(
+                        text = "4K",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp
+                        ),
+                        color = AppColors.Brand
+                    )
+                }
 
                 Text(
                     text = "Enter your activation code below to sync your playlist.",
@@ -237,8 +244,8 @@ fun LoginScreen(
                         viewModel.login(loginCode) 
                     },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
+                        .width(240.dp)
+                        .height(48.dp)
                         .scale(buttonScale),
                     enabled = !isLoading && loginCode.isNotBlank(),
                     colors = ButtonDefaults.colors(
@@ -248,30 +255,33 @@ fun LoginScreen(
                     ),
                     shape = ButtonDefaults.shape(RoundedCornerShape(12.dp))
                 ) {
-                    if (isLoading) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = Color.White,
-                                strokeWidth = 2.5.dp
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        if (isLoading) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.5.dp
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = "Authenticating...",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                                )
+                            }
+                        } else {
                             Text(
-                                text = "Authenticating...",
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                                text = "Log In",
+                                style = MaterialTheme.typography.titleSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp
+                                ),
+                                textAlign = TextAlign.Center
                             )
                         }
-                    } else {
-                        Text(
-                            text = "Log In",
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp
-                            )
-                        )
                     }
                 }
             }
