@@ -77,7 +77,7 @@ class VlcPlayerEngine(
     private val _playbackSpeed = MutableStateFlow(1.0f)
     override val playbackSpeed: StateFlow<Float> = _playbackSpeed.asStateFlow()
 
-    private val _timeshiftState = MutableStateFlow<LiveTimeshiftState>(LiveTimeshiftState.Inactive)
+    private val _timeshiftState = MutableStateFlow<LiveTimeshiftState>(LiveTimeshiftState())
     override val timeshiftState: StateFlow<LiveTimeshiftState> = _timeshiftState.asStateFlow()
 
     private val _mediaTitle = MutableStateFlow<String?>(null)
