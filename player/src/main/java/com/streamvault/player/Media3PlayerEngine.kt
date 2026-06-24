@@ -707,7 +707,7 @@ class Media3PlayerEngine @Inject constructor(
                 ) {
                     // Disable Audio Offload/Passthrough and double buffer to fix "No Audio" on some Android TV boxes
                     val bufferSizeProvider = androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider.Builder()
-                        .setPcmBufferMultiplier(2)
+                        .setPcmBufferMultiplicationFactor(2)
                         .build()
                     val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
                         .setAudioTrackBufferSizeProvider(bufferSizeProvider)
@@ -766,7 +766,7 @@ class Media3PlayerEngine @Inject constructor(
                 ) {
                     // Disable Audio Offload/Passthrough and double buffer to fix "No Audio" on some Android TV boxes
                     val bufferSizeProvider = androidx.media3.exoplayer.audio.DefaultAudioTrackBufferSizeProvider.Builder()
-                        .setPcmBufferMultiplier(2)
+                        .setPcmBufferMultiplicationFactor(2)
                         .build()
                     val customAudioSink = androidx.media3.exoplayer.audio.DefaultAudioSink.Builder(context)
                         .setAudioTrackBufferSizeProvider(bufferSizeProvider)
