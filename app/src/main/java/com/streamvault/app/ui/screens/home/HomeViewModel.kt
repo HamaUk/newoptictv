@@ -430,13 +430,6 @@ class HomeViewModel @Inject constructor(
                     val hiddenCategoryIds = values[4] as Set<Long>
                     val sortMode = values[5] as CategorySortMode
                     val pinnedCategoryIds = values[6] as Set<Long>
-                    val recentCategory = Category(
-                        id = VirtualCategoryIds.RECENT,
-                        name = "Recent",
-                        type = ContentType.LIVE,
-                        isVirtual = true,
-                        count = _uiState.value.recentChannels.size
-                    )
                     val allChannelsCategory = providerCats.firstOrNull { it.id == ChannelRepository.ALL_CHANNELS_ID }
                         ?.copy(count = providerCats.filter { it.id != ChannelRepository.ALL_CHANNELS_ID && it.id !in hiddenCategoryIds }.sumOf(Category::count))
                         ?: Category(
@@ -454,13 +447,8 @@ class HomeViewModel @Inject constructor(
                     val unpinnedProviderCategories = visibleProviderCategories.filterNot { it.id in pinnedCategoryIds }
 
                     val orderedCategories = buildList {
-                        val favoritesCategory = customCats.find { it.id == VirtualCategoryIds.FAVORITES }
-                        if (favoritesCategory != null) {
-                            add(favoritesCategory)
-                        }
-                        add(recentCategory)
-                        addAll(customCats.filter { it.id != VirtualCategoryIds.FAVORITES })
                         add(allChannelsCategory)
+                        addAll(customCats.filter { it.id != VirtualCategoryIds.FAVORITES })
                         addAll(pinnedProviderCategories)
                         addAll(unpinnedProviderCategories)
                     }

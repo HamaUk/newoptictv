@@ -791,7 +791,6 @@ private fun findActiveDestinationItem(
         ?: items.firstOrNull { it.route == currentRoute }
 
 private fun buildDestinationItems(): List<DestinationItem> = listOf(
-    DestinationItem(Routes.HOME, R.string.nav_home, Icons.Default.Home),
     DestinationItem(Routes.LIVE_TV, R.string.nav_live_tv, Icons.Default.PlayArrow),
     DestinationItem(Routes.MOVIES, R.string.nav_movies, Icons.Default.Star),
     DestinationItem(Routes.SERIES, R.string.nav_series, Icons.Default.Menu),
