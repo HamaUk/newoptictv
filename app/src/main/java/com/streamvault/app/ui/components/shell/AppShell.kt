@@ -2,6 +2,8 @@ package com.streamvault.app.ui.components.shell
 
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -370,13 +372,18 @@ private fun TopNavigationButton(
                     color = if (selected || isFocused) Color.White else AppColors.TextSecondary
                 )
             }
+            val lineWidth by animateDpAsState(
+                targetValue = if (isFocused || selected) 24.dp else 0.dp,
+                animationSpec = tween(durationMillis = 300),
+                label = "lineWidth"
+            )
             Spacer(modifier = Modifier.height(4.dp))
             Box(
                 modifier = Modifier
-                    .width(24.dp)
+                    .width(lineWidth)
                     .height(2.dp)
                     .background(
-                        color = if (isFocused) Color.Red else if (selected) Color.Red.copy(alpha = 0.5f) else Color.Transparent,
+                        color = Color.White,
                         shape = RoundedCornerShape(1.dp)
                     )
             )
