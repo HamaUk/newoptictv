@@ -460,57 +460,17 @@ fun ChannelInfoOverlay(
                 verticalAlignment = Alignment.CenterVertically,
                 contentPadding = PaddingValues(end = 8.dp)
             ) {
-                item {
-                    QuickActionButton(
-                        icon = if (showTimeshiftControls) "DVR" else stringResource(R.string.player_action_playback),
-                        label = if (showTimeshiftControls) {
-                            stringResource(R.string.player_live_dvr_controls)
-                        } else if (isPlaying) {
-                            stringResource(R.string.player_pause)
-                        } else {
-                            stringResource(R.string.player_play)
-                        },
-                        onClick = {
-                            if (showTimeshiftControls) {
-                                togglePanel(ChannelInfoPanel.LIVE_DVR)
-                            } else {
-                                onTogglePlayPause()
-                            }
-                        },
-                        onInteraction = { handleMainActionFocus(ChannelInfoPanel.LIVE_DVR.takeIf { showTimeshiftControls }) },
-                        colors = ClickableSurfaceDefaults.colors(
-                            containerColor = if (expandedPanel == ChannelInfoPanel.LIVE_DVR) {
-                                Primary.copy(alpha = 0.30f)
-                            } else {
-                                Primary.copy(alpha = 0.20f)
-                            },
-                            focusedContainerColor = Primary,
-                            pressedContainerColor = Primary.copy(alpha = 0.8f)
-                        ),
-                        modifier = Modifier
-                            .focusRequester(focusRequester)
-                            .focusProperties {
-                                if (expandedPanel == ChannelInfoPanel.LIVE_DVR) {
-                                    up = liveDvrPanelFocusRequester
-                                }
-                            }
-                    )
-                }
-                item {
-                    QuickActionButton(
-                        icon = stringResource(R.string.player_action_mute),
-                        label = if (isMuted) stringResource(R.string.player_unmute) else stringResource(R.string.player_mute),
-                        onClick = onToggleMute,
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                if (subtitleTrackCount > 0) {
+                if (!lastVisitedCategoryName.isNullOrBlank()) {
                     item {
                         QuickActionButton(
-                            icon = stringResource(R.string.player_subs),
-                            label = stringResource(R.string.player_subs),
-                            onClick = onOpenSubtitleTracks,
-                            onInteraction = { handleMainActionFocus(null) }
+                            icon = stringResource(R.string.player_action_group),
+                            label = lastVisitedCategoryName,
+                            onClick = {
+                                expandedPanel = null
+                                onOpenLastGroup()
+                            },
+                            onInteraction = { handleMainActionFocus(null) },
+                            modifier = Modifier.focusRequester(focusRequester)
                         )
                     }
                 }
@@ -520,16 +480,6 @@ fun ChannelInfoOverlay(
                             icon = stringResource(R.string.player_action_quality),
                             label = stringResource(R.string.player_quality_short),
                             onClick = onOpenVideoTracks,
-                            onInteraction = { handleMainActionFocus(null) }
-                        )
-                    }
-                }
-                if (channelVariantCount > 1) {
-                    item {
-                        QuickActionButton(
-                            icon = stringResource(R.string.player_action_variants),
-                            label = stringResource(R.string.player_variants_short),
-                            onClick = onOpenVariants,
                             onInteraction = { handleMainActionFocus(null) }
                         )
                     }
@@ -546,121 +496,11 @@ fun ChannelInfoOverlay(
                 }
                 item {
                     QuickActionButton(
-                        icon = stringResource(R.string.player_action_guide),
-                        label = stringResource(R.string.player_epg_short),
-                        onClick = {
-                            expandedPanel = null
-                            onDismiss()
-                            onOpenFullEpg()
-                        },
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                item {
-                    QuickActionButton(
-                        icon = stringResource(R.string.player_action_split),
-                        label = stringResource(R.string.player_multiview_short),
-                        onClick = {
-                            expandedPanel = null
-                            onDismiss()
-                            onOpenSplitScreen()
-                        },
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                item {
-                    QuickActionButton(
                         icon = stringResource(R.string.player_action_diagnostics),
                         label = stringResource(R.string.player_stats),
                         onClick = {
                             expandedPanel = null
                             onToggleDiagnostics()
-                        },
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                if (!lastVisitedCategoryName.isNullOrBlank()) {
-                    item {
-                        QuickActionButton(
-                            icon = stringResource(R.string.player_action_group),
-                            label = lastVisitedCategoryName,
-                            onClick = {
-                                expandedPanel = null
-                                onOpenLastGroup()
-                            },
-                            onInteraction = { handleMainActionFocus(null) }
-                        )
-                    }
-                }
-                item {
-                    QuickActionButton(
-                        icon = "REC",
-                        label = stringResource(R.string.player_record),
-                        onClick = { togglePanel(ChannelInfoPanel.RECORD) },
-                        onInteraction = { handleMainActionFocus(ChannelInfoPanel.RECORD) },
-                        colors = ClickableSurfaceDefaults.colors(
-                            containerColor = if (expandedPanel == ChannelInfoPanel.RECORD) Primary.copy(alpha = 0.22f) else AppColors.SurfaceEmphasis,
-                            focusedContainerColor = Primary.copy(alpha = 0.85f)
-                        ),
-                        modifier = Modifier
-                            .focusRequester(recordButtonFocusRequester)
-                            .focusProperties {
-                                if (expandedPanel == ChannelInfoPanel.RECORD) {
-                                    up = recordPanelFocusRequester
-                                }
-                            }
-                    )
-                }
-                if (hasCatchUpOptions) {
-                    item {
-                        QuickActionButton(
-                            icon = "C-UP",
-                            label = stringResource(R.string.player_catchup_badge),
-                            onClick = { togglePanel(ChannelInfoPanel.CATCH_UP) },
-                            onInteraction = { handleMainActionFocus(ChannelInfoPanel.CATCH_UP) },
-                            colors = ClickableSurfaceDefaults.colors(
-                                containerColor = if (expandedPanel == ChannelInfoPanel.CATCH_UP) Primary.copy(alpha = 0.22f) else AppColors.SurfaceEmphasis,
-                                focusedContainerColor = Primary.copy(alpha = 0.85f)
-                            ),
-                            modifier = Modifier
-                                .focusRequester(catchUpButtonFocusRequester)
-                                .focusProperties {
-                                    if (expandedPanel == ChannelInfoPanel.CATCH_UP) {
-                                        up = catchUpPanelFocusRequester
-                                    }
-                                }
-                        )
-                    }
-                }
-                item {
-                    QuickActionButton(
-                        icon = stringResource(R.string.player_action_cast),
-                        label = if (isCastConnected) stringResource(R.string.player_stop_casting) else stringResource(R.string.player_cast),
-                        onClick = {
-                            expandedPanel = null
-                            if (isCastConnected) onStopCasting() else onCast()
-                        },
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                item {
-                    QuickActionButton(
-                        icon = stringResource(R.string.player_action_pip),
-                        label = stringResource(R.string.player_pip_short),
-                        onClick = {
-                            expandedPanel = null
-                            onEnterPictureInPicture()
-                        },
-                        onInteraction = { handleMainActionFocus(null) }
-                    )
-                }
-                item {
-                    QuickActionButton(
-                        icon = stringResource(R.string.player_action_view),
-                        label = currentAspectRatio,
-                        onClick = {
-                            expandedPanel = null
-                            onToggleAspectRatio()
                         },
                         onInteraction = { handleMainActionFocus(null) }
                     )
