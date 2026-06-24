@@ -541,6 +541,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setPlayerEngineType(type: com.streamvault.domain.model.PlayerEngineType) {
+        viewModelScope.launch {
+            preferencesRepository.setPlayerEngineType(type)
+        }
+    }
+
     fun setPlayerControlsTimeoutSeconds(seconds: Int) {
         viewModelScope.launch {
             preferencesRepository.setPlayerControlsTimeoutSeconds(seconds)

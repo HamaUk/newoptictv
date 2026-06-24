@@ -97,25 +97,4 @@ object NetworkModule {
     @Singleton
     fun provideGson(): Gson = GsonBuilder().create()
 
-    @Provides
-    @Singleton
-    @MainPlayerEngine
-    fun provideMainPlayerEngine(
-        @ApplicationContext context: Context,
-        okHttpClient: OkHttpClient
-    ): PlayerEngine = Media3PlayerEngine(context, okHttpClient)
-
-    /**
-     * Factory binding for preview and multiview playback.
-     * Each Provider.get() call returns a fresh engine instance.
-     */
-    @Provides
-    @AuxiliaryPlayerEngine
-    fun provideAuxiliaryPlayerEngine(
-        @ApplicationContext context: Context,
-        okHttpClient: OkHttpClient
-    ): PlayerEngine = Media3PlayerEngine(context, okHttpClient).apply {
-        enableMediaSession = false
-        bypassAudioFocus = true
-    }
 }

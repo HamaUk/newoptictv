@@ -46,6 +46,9 @@ dependencies {
     implementation(libs.media3.session)
     implementation(libs.media3.ui)
 
+    // VLC
+    implementation(libs.vlc.android)
+
     // OkHttp (for custom data source)
     implementation(libs.okhttp)
 

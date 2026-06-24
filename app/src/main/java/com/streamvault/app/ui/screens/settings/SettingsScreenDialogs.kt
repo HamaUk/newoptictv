@@ -67,6 +67,8 @@ internal fun SettingsScreenDialogs(
     onShowPlaybackSpeedDialogChange: (Boolean) -> Unit,
     showDecoderModeDialog: Boolean,
     onShowDecoderModeDialogChange: (Boolean) -> Unit,
+    showPlayerEngineTypeDialog: Boolean,
+    onShowPlayerEngineTypeDialogChange: (Boolean) -> Unit,
     showTimeshiftDepthDialog: Boolean,
     onShowTimeshiftDepthDialogChange: (Boolean) -> Unit,
     showControlsTimeoutDialog: Boolean,
@@ -273,6 +275,31 @@ internal fun SettingsScreenDialogs(
                     onSelect = {
                         viewModel.setPlayerDecoderMode(option.first)
                         onShowDecoderModeDialogChange(false)
+                    }
+                )
+            }
+        }
+    }
+
+    if (showPlayerEngineTypeDialog) {
+        val engineOptions = remember(context) {
+            listOf(
+                com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER to "Media3 (ExoPlayer)",
+                com.streamvault.domain.model.PlayerEngineType.VLC to "VLC Player"
+            )
+        }
+        PremiumSelectionDialog(
+            title = "Select Player Engine",
+            onDismiss = { onShowPlayerEngineTypeDialogChange(false) }
+        ) {
+            engineOptions.forEachIndexed { index, option ->
+                LevelOption(
+                    level = index,
+                    text = option.second,
+                    currentLevel = if (uiState.playerEngineType == option.first) index else -1,
+                    onSelect = {
+                        viewModel.setPlayerEngineType(option.first)
+                        onShowPlayerEngineTypeDialogChange(false)
                     }
                 )
             }

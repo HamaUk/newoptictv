@@ -37,8 +37,7 @@ import javax.inject.Provider
 class MultiViewViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     val multiViewManager: MultiViewManager,
-    @AuxiliaryPlayerEngine
-    private val playerEngineProvider: Provider<PlayerEngine>,
+    private val playerEngineFactory: com.streamvault.app.di.PlayerEngineFactory,
     private val preferencesRepository: PreferencesRepository,
     private val channelRepository: ChannelRepository,
     private val favoriteRepository: FavoriteRepository,
@@ -69,6 +68,7 @@ class MultiViewViewModel @Inject constructor(
     private var slotInitVersion: Long = 0L
     private var playbackSessionActive: Boolean = false
     private var currentProviderId: Long? = null
+    private var currentPlayerEngineType: com.streamvault.domain.model.PlayerEngineType = com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER
 
     /** Flow of the current 4 slot channels from the manager */
     val slotsFlow = multiViewManager.slots
@@ -128,6 +128,20 @@ class MultiViewViewModel @Inject constructor(
                 if (activeProviderConnectionLimit != nextConnectionLimit) {
                     activeProviderConnectionLimit = nextConnectionLimit
                     if (multiViewManager.hasAnyChannel) {
+                        restartPlaybackIfActive()
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            preferencesRepository.playerEngineType.collect { engineType ->
+                currentPlayerEngineType = engineType
+                // Multi-view dynamically allocates engines per slot. If preference changes mid-session,
+                // we restart playback.
+                if (playbackSessionActive) {
+                    val sampleEngine = playerEngines.values.firstOrNull()
+                    if (sampleEngine != null && sampleEngine::class != playerEngineFactory.create(engineType, true)::class) {
                         restartPlaybackIfActive()
                     }
                 }
@@ -226,7 +240,7 @@ class MultiViewViewModel @Inject constructor(
                     kotlinx.coroutines.delay(index * _uiState.value.performancePolicy.startupDelayMs)
                     if (initVersion != slotInitVersion) return@launch
                     try {
-                        val engine = playerEngineProvider.get()
+                        val engine = playerEngineFactory.create(currentPlayerEngineType, forAuxiliary = true)
                         // Cap each multi-view slot to 720p so slots don't compete for 4K bandwidth
                         (engine as? com.streamvault.player.Media3PlayerEngine)
                             ?.let {

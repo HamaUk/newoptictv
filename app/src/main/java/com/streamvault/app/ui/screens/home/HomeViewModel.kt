@@ -59,7 +59,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.app.Application
-import javax.inject.Provider as InjectProvider
+import android.app.Application
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -80,8 +80,7 @@ class HomeViewModel @Inject constructor(
     private val tvInputChannelSyncManager: TvInputChannelSyncManager,
     private val multiViewManager: MultiViewManager,
     private val livePreviewHandoffManager: LivePreviewHandoffManager,
-    @AuxiliaryPlayerEngine
-    private val playerEngineProvider: InjectProvider<PlayerEngine>
+    private val playerEngineFactory: com.streamvault.app.di.PlayerEngineFactory
 ) : ViewModel() {
     private companion object {
         const val MIN_CHANNEL_SEARCH_QUERY_LENGTH = 2
@@ -110,6 +109,7 @@ class HomeViewModel @Inject constructor(
     private var previewPlayerEngine: PlayerEngine? = null
     private var previewSessionVersion: Long = 0L
     private var combinedCategoriesById: Map<Long, CombinedCategory> = emptyMap()
+    private var currentPlayerEngineType: com.streamvault.domain.model.PlayerEngineType = com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER
 
     init {
         loadAllProviders()
@@ -366,6 +366,13 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+        viewModelScope.launch {
+            preferencesRepository.playerEngineType.collectLatest { engineType ->
+                currentPlayerEngineType = engineType
+                if (previewPlayerEngine != null && previewPlayerEngine!!::class != playerEngineFactory.create(engineType, true)::class) {
+                    clearPreview()
+                }
+            }
         }
     }
 
@@ -921,7 +928,7 @@ class HomeViewModel @Inject constructor(
         if (_uiState.value.previewChannelId == channel.id && _uiState.value.previewPlayerEngine != null) return
 
         val previewVersion = ++previewSessionVersion
-        val engine = previewPlayerEngine ?: playerEngineProvider.get().also { previewPlayerEngine = it }
+        val engine = previewPlayerEngine ?: playerEngineFactory.create(currentPlayerEngineType, forAuxiliary = true).also { previewPlayerEngine = it }
         previewPlaybackJob?.cancel()
         previewErrorJob?.cancel()
 

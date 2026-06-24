@@ -73,8 +73,7 @@ import okhttp3.Request
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayerViewModel @Inject constructor(
-    @param:MainPlayerEngine
-    private val mainPlayerEngine: PlayerEngine,
+    private val playerEngineFactory: com.streamvault.app.di.PlayerEngineFactory,
     private val epgRepository: EpgRepository,
     internal val channelRepository: ChannelRepository,
     internal val movieRepository: MovieRepository,
@@ -109,7 +108,7 @@ class PlayerViewModel @Inject constructor(
         private const val LOW_BANDWIDTH_DURATION_SECONDS = 30
     }
 
-    private val activePlayerEngineFlow = MutableStateFlow(mainPlayerEngine)
+    private val activePlayerEngineFlow = MutableStateFlow(playerEngineFactory.create(com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER))
     val activePlayerEngine: StateFlow<PlayerEngine> = activePlayerEngineFlow.asStateFlow()
     val playerEngine: PlayerEngine
         get() = activePlayerEngineFlow.value
@@ -396,6 +395,25 @@ class PlayerViewModel @Inject constructor(
     }
 
     init {
+        viewModelScope.launch {
+            preferencesRepository.playerEngineType.collect { engineType ->
+                val newEngine = playerEngineFactory.create(engineType)
+                if (activePlayerEngineFlow.value::class != newEngine::class) {
+                    val wasPlaying = activePlayerEngineFlow.value.isPlaying.value
+                    val currentPos = activePlayerEngineFlow.value.currentPosition.value
+                    activePlayerEngineFlow.value.release()
+                    activePlayerEngineFlow.value = newEngine
+                    
+                    // Restore state if we were already playing
+                    if (wasPlaying && currentStreamInfo != null) {
+                        newEngine.prepare(currentStreamInfo!!)
+                        newEngine.seekTo(currentPos)
+                    }
+                } else {
+                    newEngine.release() // Duplicate type, discard
+                }
+            }
+        }
         viewModelScope.launch {
             activePlayerEngineFlow.flatMapLatest { it.error }.collect { error ->
                 if (error != null) {
@@ -1161,7 +1179,8 @@ class PlayerViewModel @Inject constructor(
         return runCatching {
             // Media3 requires a globally unique session ID. Release the main engine's
             // session before the adopted live engine enables its own replacement.
-            mainPlayerEngine.setMediaSessionEnabled(false)
+            val mainEngine = activePlayerEngineFlow.value
+            mainEngine.setMediaSessionEnabled(false)
             setActivePlayerEngine(adoptedEngine)
             (adoptedEngine as? Media3PlayerEngine)?.let {
                 it.bypassAudioFocus = false
@@ -1170,7 +1189,8 @@ class PlayerViewModel @Inject constructor(
             }
             applyPlaybackPreferences()
             if (!isActivePlaybackSession(requestVersion)) {
-                setActivePlayerEngine(mainPlayerEngine)
+                val mainEngine = playerEngineFactory.create(com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER)
+                setActivePlayerEngine(mainEngine)
                 adoptedEngine.release()
                 false
             } else {
@@ -1184,7 +1204,8 @@ class PlayerViewModel @Inject constructor(
         }.getOrElse {
             livePreviewHandoffManager.clear(adoptedEngine)
             if (playerEngine === adoptedEngine) {
-                setActivePlayerEngine(mainPlayerEngine)
+                val mainEngine = playerEngineFactory.create(com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER)
+                setActivePlayerEngine(mainEngine)
             }
             adoptedEngine.release()
             false
@@ -2908,8 +2929,11 @@ class PlayerViewModel @Inject constructor(
         seekThumbnailProvider.clearCache()
         livePreviewHandoffManager.clear(playerEngine)
         playerEngine.release()
-        if (mainPlayerEngine !== playerEngine) {
-            mainPlayerEngine.release()
+        // Cannot directly check mainPlayerEngine anymore since it's dynamic
+        // If we are discarding an auxiliary engine, release it.
+        if (playerEngine !== activePlayerEngineFlow.value) {
+            playerEngine.release()
         }
+        playerEngine.clearRenderBinding()
     }
 }

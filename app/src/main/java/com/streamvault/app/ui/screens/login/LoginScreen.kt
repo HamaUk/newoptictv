@@ -71,8 +71,11 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val sharedPreferences = remember { context.getSharedPreferences("login_prefs", android.content.Context.MODE_PRIVATE) }
+    
     val uiState by viewModel.uiState.collectAsState()
-    var loginCode by remember { mutableStateOf("") }
+    var loginCode by remember { mutableStateOf(sharedPreferences.getString("saved_login_code", "") ?: "") }
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.Success) {
@@ -201,7 +204,10 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TvButton(
-                    onClick = { viewModel.login(loginCode) },
+                    onClick = { 
+                        sharedPreferences.edit().putString("saved_login_code", loginCode).apply()
+                        viewModel.login(loginCode) 
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

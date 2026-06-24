@@ -100,6 +100,7 @@ class PreferencesRepository @Inject constructor(
         val PLAYER_MUTED = booleanPreferencesKey("player_muted")
         val PLAYER_MEDIA_SESSION_ENABLED = booleanPreferencesKey("player_media_session_enabled")
         val PLAYER_DECODER_MODE = stringPreferencesKey("player_decoder_mode")
+        val PLAYER_ENGINE_TYPE = stringPreferencesKey("player_engine_type")
         val PLAYER_PLAYBACK_SPEED = stringPreferencesKey("player_playback_speed")
         val PREFERRED_AUDIO_LANGUAGE = stringPreferencesKey("preferred_audio_language")
         val PLAYER_SUBTITLE_TEXT_SCALE = stringPreferencesKey("player_subtitle_text_scale")
@@ -243,6 +244,18 @@ class PreferencesRepository @Inject constructor(
         preferences[PreferencesKeys.PLAYER_DECODER_MODE]
             ?.let { saved -> DecoderMode.entries.firstOrNull { it.name == saved } }
             ?: DecoderMode.AUTO
+    }
+
+    val playerEngineType: Flow<com.streamvault.domain.model.PlayerEngineType> = context.dataStore.data.map { preferences ->
+        preferences[PreferencesKeys.PLAYER_ENGINE_TYPE]?.let { modeStr ->
+            try { com.streamvault.domain.model.PlayerEngineType.valueOf(modeStr) } catch (e: Exception) { com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER }
+        } ?: com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER
+    }
+
+    suspend fun setPlayerEngineType(type: com.streamvault.domain.model.PlayerEngineType) {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.PLAYER_ENGINE_TYPE] = type.name
+        }
     }
 
     val playerPlaybackSpeed: Flow<Float> = context.dataStore.data.map { preferences ->

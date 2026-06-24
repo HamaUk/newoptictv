@@ -1449,6 +1449,13 @@ internal fun formatDecoderModeLabel(mode: DecoderMode, context: android.content.
     }
 }
 
+internal fun formatPlayerEngineTypeLabel(type: com.streamvault.domain.model.PlayerEngineType, context: android.content.Context): String {
+    return when (type) {
+        com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER -> "Media3 (ExoPlayer)"
+        com.streamvault.domain.model.PlayerEngineType.VLC -> "VLC Player"
+    }
+}
+
 internal fun formatTimeoutSecondsLabel(seconds: Int, context: android.content.Context): String {
     return context.resources.getQuantityString(
         R.plurals.settings_timeout_seconds,

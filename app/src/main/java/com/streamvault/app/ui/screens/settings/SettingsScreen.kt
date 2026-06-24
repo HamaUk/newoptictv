@@ -139,6 +139,9 @@ fun SettingsScreen(
     val decoderModeLabel = remember(uiState.playerDecoderMode, context) {
         formatDecoderModeLabel(uiState.playerDecoderMode, context)
     }
+    val playerEngineLabel = remember(uiState.playerEngineType, context) {
+        formatPlayerEngineTypeLabel(uiState.playerEngineType, context)
+    }
     val controlsTimeoutLabel = remember(uiState.playerControlsTimeoutSeconds, context) {
         formatTimeoutSecondsLabel(uiState.playerControlsTimeoutSeconds, context)
     }
@@ -217,6 +220,7 @@ fun SettingsScreen(
     var showGuideDefaultCategoryDialog by rememberSaveable { mutableStateOf(false) }
     var showPlaybackSpeedDialog by rememberSaveable { mutableStateOf(false) }
     var showDecoderModeDialog by rememberSaveable { mutableStateOf(false) }
+    var showPlayerEngineTypeDialog by rememberSaveable { mutableStateOf(false) }
     var showTimeshiftDepthDialog by rememberSaveable { mutableStateOf(false) }
     var showControlsTimeoutDialog by rememberSaveable { mutableStateOf(false) }
     var showLiveOverlayTimeoutDialog by rememberSaveable { mutableStateOf(false) }
@@ -511,6 +515,11 @@ fun SettingsScreen(
                                 label = stringResource(R.string.settings_decoder_mode),
                                 value = decoderModeLabel,
                                 onClick = { showDecoderModeDialog = true }
+                            )
+                            ClickableSettingsRow(
+                                label = "Player Engine",
+                                value = playerEngineLabel,
+                                onClick = { showPlayerEngineTypeDialog = true }
                             )
                             HorizontalDivider(color = Color.White.copy(alpha = 0.07f), modifier = Modifier.padding(vertical = 4.dp))
                             ClickableSettingsRow(
@@ -931,6 +940,8 @@ fun SettingsScreen(
         onShowPlaybackSpeedDialogChange = { showPlaybackSpeedDialog = it },
         showDecoderModeDialog = showDecoderModeDialog,
         onShowDecoderModeDialogChange = { showDecoderModeDialog = it },
+        showPlayerEngineTypeDialog = showPlayerEngineTypeDialog,
+        onShowPlayerEngineTypeDialogChange = { showPlayerEngineTypeDialog = it },
         showTimeshiftDepthDialog = showTimeshiftDepthDialog,
         onShowTimeshiftDepthDialogChange = { showTimeshiftDepthDialog = it },
         showControlsTimeoutDialog = showControlsTimeoutDialog,

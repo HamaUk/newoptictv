@@ -51,6 +51,7 @@ internal fun observeSettingsPreferenceSnapshot(
             hasParentalPin = hasParentalPin,
             appLanguage = "system",
             preferredAudioLanguage = "auto",
+            playerEngineType = com.streamvault.domain.model.PlayerEngineType.EXO_PLAYER,
             playerMediaSessionEnabled = true,
             playerDecoderMode = DecoderMode.AUTO,
             playerPlaybackSpeed = 1f,
@@ -102,6 +103,8 @@ internal fun observeSettingsPreferenceSnapshot(
         snapshot.copy(appLanguage = language)
     }.combine(preferencesRepository.preferredAudioLanguage) { snapshot, preferredAudioLanguage ->
         snapshot.copy(preferredAudioLanguage = preferredAudioLanguage ?: "auto")
+    }.combine(preferencesRepository.playerEngineType) { snapshot, engineType ->
+        snapshot.copy(playerEngineType = engineType)
     }.combine(preferencesRepository.playerMediaSessionEnabled) { snapshot, mediaSessionEnabled ->
         snapshot.copy(playerMediaSessionEnabled = mediaSessionEnabled)
     }.combine(preferencesRepository.playerDecoderMode) { snapshot, decoderMode ->
@@ -206,6 +209,7 @@ internal fun SettingsUiState.applyPreferenceSnapshot(snapshot: SettingsPreferenc
         hasParentalPin = snapshot.hasParentalPin,
         appLanguage = snapshot.appLanguage,
         preferredAudioLanguage = snapshot.preferredAudioLanguage,
+        playerEngineType = snapshot.playerEngineType,
         playerMediaSessionEnabled = snapshot.playerMediaSessionEnabled,
         playerDecoderMode = snapshot.playerDecoderMode,
         playerPlaybackSpeed = snapshot.playerPlaybackSpeed,
